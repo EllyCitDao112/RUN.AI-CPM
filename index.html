@@ -1,163 +1,729 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kikundi CPM Engine</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kikundi CPM Engine - Video Plays + Likes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #ffffff;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0d0d0d;
-  color: #ffffff;
-}
+    .container {
+      max-width: 860px;
+      margin: auto;
+      padding: 20px;
+    }
 
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-}
+    h1, h2 {
+      text-align: center;
+    }
 
-h1 {
-  text-align: center;
-}
+    .card {
+      background: #171717;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
 
-video {
-  width: 100%;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
+    video {
+      width: 100%;
+      border-radius: 12px;
+      background: #000;
+      margin-bottom: 14px;
+    }
 
-input, select, button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-}
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
 
-input, select {
-  background: #1a1a1a;
-  color: #fff;
-}
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
 
-button {
-  background: #00c27a;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
+    input, select {
+      background: #232323;
+      color: #fff;
+    }
 
-.result {
-  margin-top: 20px;
-  padding: 15px;
-  background: #1a1a1a;
-  border-radius: 10px;
-}
-</style>
+    button {
+      background: #00c27a;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: #232323;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-box .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 6px;
+      color: #00e08f;
+    }
+
+    .row-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .secondary {
+      background: #444;
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      background: #232323;
+      border-radius: 12px;
+      line-height: 1.7;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #bdbdbd;
+      margin-top: 8px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <h1>📊 Kikundi CPM Engine</h1>
 
-<div class="container">
+    <div class="card">
+      <h2>🎥 Video Performance</h2>
 
-<h1>📊 Kikundi CPM Engine</h1>
+      <video id="videoPlayer" controls playsinline>
+        <source src="VID-20260317-WA0001.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
-<!-- VIDEO -->
-<video controls>
-  <source src="VID-20260317-WA0001.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div>Total Plays</div>
+          <div class="value" id="playCount">0</div>
+        </div>
+        <div class="stat-box">
+          <div>Total Likes</div>
+          <div class="value" id="likeCount">0</div>
+        </div>
+        <div class="stat-box">
+          <div>Like Rate</div>
+          <div class="value" id="likeRate">0.00%</div>
+        </div>
+        <div class="stat-box">
+          <div>Revenue / Play</div>
+          <div class="value" id="revenuePerPlay">$0.00</div>
+        </div>
+      </div>
 
-<!-- INPUTS -->
-<label>Impressions</label>
-<input type="number" id="impressions" placeholder="e.g. 1000000">
+      <div class="row-buttons">
+        <button id="likeBtn" type="button">👍 Like Video</button>
+        <button id="resetBtn" type="button" class="secondary">♻ Reset Plays & Likes</button>
+      </div>
 
-<label>Base CPM ($)</label>
-<input type="number" id="baseCPM" value="1">
+      <p class="note">
+        Plays and likes are stored in this browser only. If you want shared live counts for all users,
+        you will need a backend such as Firebase, Supabase, or a custom API.
+      </p>
+    </div>
 
-<label>Location</label>
-<select id="location">
-  <option value="tanzania">Tanzania</option>
-  <option value="africa">Africa</option>
-  <option value="international">International</option>
-</select>
+    <div class="card">
+      <h2>💰 CPM Revenue Calculator</h2>
 
-<label>Audience</label>
-<select id="audience">
-  <option value="general">General</option>
-  <option value="social">Social</option>
-  <option value="business">Business</option>
-  <option value="crypto">Crypto</option>
-</select>
+      <label for="impressions">Impressions</label>
+      <input type="number" id="impressions" placeholder="e.g. 1000000" value="10000" />
 
-<label>Engagement Rate (%)</label>
-<input type="number" id="engagement" value="5">
+      <label for="baseCPM">Base CPM (USD)</label>
+      <input type="number" id="baseCPM" step="0.01" value="1.00" />
 
-<label>Trust Score</label>
-<select id="trust">
-  <option value="0.7">Anonymous</option>
-  <option value="1">Logged In</option>
-  <option value="1.5">Verified</option>
-  <option value="2">Wallet Connected</option>
-  <option value="3">Premium</option>
-</select>
+      <label for="location">Location</label>
+      <select id="location">
+        <option value="tanzania">Tanzania</option>
+        <option value="africa">Africa</option>
+        <option value="international">International</option>
+      </select>
 
-<button onclick="calculate()">Calculate CPM</button>
+      <label for="audience">Audience Type</label>
+      <select id="audience">
+        <option value="general">General</option>
+        <option value="social">Social</option>
+        <option value="business">Business</option>
+        <option value="crypto">Crypto / Finance</option>
+      </select>
 
-<!-- RESULTS -->
-<div class="result" id="output">
-Results will appear here...
-</div>
+      <label for="engagement">Engagement Rate (%)</label>
+      <input type="number" id="engagement" step="0.01" value="5" />
 
-</div>
+      <label for="trust">Trust Score</label>
+      <select id="trust">
+        <option value="0.7">Anonymous</option>
+        <option value="1">Logged In</option>
+        <option value="1.5">Verified</option>
+        <option value="2">Wallet Connected</option>
+        <option value="3">Premium</option>
+      </select>
 
-<script>
-function calculate() {
+      <button type="button" onclick="calculate()">Calculate CPM Revenue</button>
 
-  let impressions = parseFloat(document.getElementById("impressions").value) || 0;
-  let baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
-  let location = document.getElementById("location").value;
-  let audience = document.getElementById("audience").value;
-  let engagement = parseFloat(document.getElementById("engagement").value) || 0;
-  let trust = parseFloat(document.getElementById("trust").value);
+      <div class="result" id="output">
+        Results will appear here.
+      </div>
+    </div>
+  </div>
 
-  const locationMultiplier = {
-    tanzania: 0.5,
-    africa: 1.0,
-    international: 3.0
-  };
+  <script>
+    const STORAGE_KEYS = {
+      plays: "kikundi_video_plays",
+      likes: "kikundi_video_likes"
+    };
 
-  const audienceMultiplier = {
-    general: 0.8,
-    social: 1.0,
-    business: 1.5,
-    crypto: 3.0
-  };
+    const video = document.getElementById("videoPlayer");
+    const playCountEl = document.getElementById("playCount");
+    const likeCountEl = document.getElementById("likeCount");
+    const likeRateEl = document.getElementById("likeRate");
+    const revenuePerPlayEl = document.getElementById("revenuePerPlay");
+    const likeBtn = document.getElementById("likeBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
-  let engagementMultiplier = 1 + ((engagement / 100) * 5);
+    let playCount = parseInt(localStorage.getItem(STORAGE_KEYS.plays), 10) || 0;
+    let likeCount = parseInt(localStorage.getItem(STORAGE_KEYS.likes), 10) || 0;
+    let hasCountedThisSessionPlay = false;
 
-  let smartCPM = baseCPM *
-                 locationMultiplier[location] *
-                 audienceMultiplier[audience] *
-                 engagementMultiplier *
-                 trust;
+    function saveStats() {
+      localStorage.setItem(STORAGE_KEYS.plays, String(playCount));
+      localStorage.setItem(STORAGE_KEYS.likes, String(likeCount));
+    }
 
-  let revenue = (impressions / 1000) * smartCPM;
+    function updateStatsUI() {
+      playCountEl.textContent = playCount.toLocaleString();
+      likeCountEl.textContent = likeCount.toLocaleString();
 
-  // TZS Conversion (approx)
-  let tzs = revenue * 2500;
+      const likeRate = playCount > 0 ? (likeCount / playCount) * 100 : 0;
+      likeRateEl.textContent = likeRate.toFixed(2) + "%";
 
-  document.getElementById("output").innerHTML = `
-    <h2>Results</h2>
-    <p><strong>Smart CPM:</strong> $${smartCPM.toFixed(2)}</p>
-    <p><strong>Revenue (USD):</strong> $${revenue.toFixed(2)}</p>
-    <p><strong>Revenue (TZS):</strong> ${tzs.toLocaleString()} TZS</p>
-  `;
-}
-</script>
+      const revenue = getCurrentRevenue();
+      const revenuePerPlay = playCount > 0 ? revenue / playCount : 0;
+      revenuePerPlayEl.textContent = "$" + revenuePerPlay.toFixed(2);
+    }
 
+    function getCurrentRevenue() {
+      const impressions = parseFloat(document.getElementById("impressions").value) || 0;
+      const baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
+      const location = document.getElementById("location").value;
+      const audience = document.getElementById("audience").value;
+      const engagement = parseFloat(document.getElementById("engagement").value) || 0;
+      const trust = parseFloat(document.getElementById("trust").value) || 1;
+
+      const locationMultiplier = {
+        tanzania: 0.5,
+        africa: 1.0,
+        international: 3.0
+      };
+
+      const audienceMultiplier = {
+        general: 0.8,
+        social: 1.0,
+        business: 1.5,
+        crypto: 3.0
+      };
+
+      const engagementMultiplier = 1 + ((engagement / 100) * 5);
+
+      const smartCPM =
+        baseCPM *
+        locationMultiplier[location] *
+        audienceMultiplier[audience] *
+        engagementMultiplier *
+        trust;
+
+      const revenue = (impressions / 1000) * smartCPM;
+      return revenue;
+    }
+
+    function calculate() {
+      const impressions = parseFloat(document.getElementById("impressions").value) || 0;
+      const baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
+      const location = document.getElementById("location").value;
+      const audience = document.getElementById("audience").value;
+      const engagement = parseFloat(document.getElementById("engagement").value) || 0;
+      const trust = parseFloat(document.getElementById("trust").value) || 1;
+
+      const locationMultiplier = {
+        tanzania: 0.5,
+        africa: 1.0,
+        international: 3.0
+      };
+
+      const audienceMultiplier = {
+        general: 0.8,
+        social: 1.0,
+        business: 1.5,
+        crypto: 3.0
+      };
+
+      const engagementMultiplier = 1 + ((engagement / 100) * 5);
+
+      const smartCPM =
+        baseCPM *
+        locationMultiplier[location] *
+        audienceMultiplier[audience] *
+        engagementMultiplier *
+        trust;
+
+      const revenue = (impressions / 1000) * smartCPM;
+      const tzsRate = 2500;
+      const revenueTZS = revenue * tzsRate;
+      const revenuePerPlay = playCount > 0 ? revenue / playCount : 0;
+
+      document.getElementById("output").innerHTML = `
+        <h3>Estimated Results</h3>
+        <p><strong>Smart CPM:</strong> $${smartCPM.toFixed(2)}</p>
+        <p><strong>Total Revenue (USD):</strong> $${revenue.toFixed(2)}</p>
+        <p><strong>Total Revenue (TZS):</strong> ${revenueTZS.toLocaleString()} TZS</p>
+        <p><strong>Video Plays:</strong> ${playCount.toLocaleString()}</p>
+        <p><strong>Video Likes:</strong> ${likeCount.toLocaleString()}</p>
+        <p><strong>Estimated Revenue Per Play:</strong> $${revenuePerPlay.toFixed(2)}</p>
+      `;
+
+      updateStatsUI();
+    }
+
+    video.addEventListener("play", () => {
+      if (!hasCountedThisSessionPlay) {
+        playCount += 1;
+        hasCountedThisSessionPlay = true;
+        saveStats();
+        updateStatsUI();
+        calculate();
+      }
+    });
+
+    video.addEventListener("ended", () => {
+      hasCountedThisSessionPlay = false;
+    });
+
+    likeBtn.addEventListener("click", () => {
+      likeCount += 1;
+      saveStats();
+      updateStatsUI();
+      calculate();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      playCount = 0;
+      likeCount = 0;
+      hasCountedThisSessionPlay = false;
+      saveStats();
+      updateStatsUI();
+      calculate();
+    });
+
+    ["impressions", "baseCPM", "location", "audience", "engagement", "trust"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", () => {
+        calculate();
+      });
+      document.getElementById(id).addEventListener("change", () => {
+        calculate();
+      });
+    });
+
+    updateStatsUI();
+    calculate();
+  </script>
 </body>
-  </html>
+  </html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kikundi CPM Engine - Video Plays + Likes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #ffffff;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .card {
+      background: #171717;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 12px;
+      background: #000;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input, select {
+      background: #232323;
+      color: #fff;
+    }
+
+    button {
+      background: #00c27a;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: #232323;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-box .value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 6px;
+      color: #00e08f;
+    }
+
+    .row-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .secondary {
+      background: #444;
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      background: #232323;
+      border-radius: 12px;
+      line-height: 1.7;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #bdbdbd;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Kikundi CPM Engine</h1>
+
+    <div class="card">
+      <h2>🎥 Video Performance</h2>
+
+      <video id="videoPlayer" controls playsinline>
+        <source src="VID-20260317-WA0001.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div>Total Plays</div>
+          <div class="value" id="playCount">0</div>
+        </div>
+        <div class="stat-box">
+          <div>Total Likes</div>
+          <div class="value" id="likeCount">0</div>
+        </div>
+        <div class="stat-box">
+          <div>Like Rate</div>
+          <div class="value" id="likeRate">0.00%</div>
+        </div>
+        <div class="stat-box">
+          <div>Revenue / Play</div>
+          <div class="value" id="revenuePerPlay">$0.00</div>
+        </div>
+      </div>
+
+      <div class="row-buttons">
+        <button id="likeBtn" type="button">👍 Like Video</button>
+        <button id="resetBtn" type="button" class="secondary">♻ Reset Plays & Likes</button>
+      </div>
+
+      <p class="note">
+        Plays and likes are stored in this browser only. If you want shared live counts for all users,
+        you will need a backend such as Firebase, Supabase, or a custom API.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>💰 CPM Revenue Calculator</h2>
+
+      <label for="impressions">Impressions</label>
+      <input type="number" id="impressions" placeholder="e.g. 1000000" value="10000" />
+
+      <label for="baseCPM">Base CPM (USD)</label>
+      <input type="number" id="baseCPM" step="0.01" value="1.00" />
+
+      <label for="location">Location</label>
+      <select id="location">
+        <option value="tanzania">Tanzania</option>
+        <option value="africa">Africa</option>
+        <option value="international">International</option>
+      </select>
+
+      <label for="audience">Audience Type</label>
+      <select id="audience">
+        <option value="general">General</option>
+        <option value="social">Social</option>
+        <option value="business">Business</option>
+        <option value="crypto">Crypto / Finance</option>
+      </select>
+
+      <label for="engagement">Engagement Rate (%)</label>
+      <input type="number" id="engagement" step="0.01" value="5" />
+
+      <label for="trust">Trust Score</label>
+      <select id="trust">
+        <option value="0.7">Anonymous</option>
+        <option value="1">Logged In</option>
+        <option value="1.5">Verified</option>
+        <option value="2">Wallet Connected</option>
+        <option value="3">Premium</option>
+      </select>
+
+      <button type="button" onclick="calculate()">Calculate CPM Revenue</button>
+
+      <div class="result" id="output">
+        Results will appear here.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      plays: "kikundi_video_plays",
+      likes: "kikundi_video_likes"
+    };
+
+    const video = document.getElementById("videoPlayer");
+    const playCountEl = document.getElementById("playCount");
+    const likeCountEl = document.getElementById("likeCount");
+    const likeRateEl = document.getElementById("likeRate");
+    const revenuePerPlayEl = document.getElementById("revenuePerPlay");
+    const likeBtn = document.getElementById("likeBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    let playCount = parseInt(localStorage.getItem(STORAGE_KEYS.plays), 10) || 0;
+    let likeCount = parseInt(localStorage.getItem(STORAGE_KEYS.likes), 10) || 0;
+    let hasCountedThisSessionPlay = false;
+
+    function saveStats() {
+      localStorage.setItem(STORAGE_KEYS.plays, String(playCount));
+      localStorage.setItem(STORAGE_KEYS.likes, String(likeCount));
+    }
+
+    function updateStatsUI() {
+      playCountEl.textContent = playCount.toLocaleString();
+      likeCountEl.textContent = likeCount.toLocaleString();
+
+      const likeRate = playCount > 0 ? (likeCount / playCount) * 100 : 0;
+      likeRateEl.textContent = likeRate.toFixed(2) + "%";
+
+      const revenue = getCurrentRevenue();
+      const revenuePerPlay = playCount > 0 ? revenue / playCount : 0;
+      revenuePerPlayEl.textContent = "$" + revenuePerPlay.toFixed(2);
+    }
+
+    function getCurrentRevenue() {
+      const impressions = parseFloat(document.getElementById("impressions").value) || 0;
+      const baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
+      const location = document.getElementById("location").value;
+      const audience = document.getElementById("audience").value;
+      const engagement = parseFloat(document.getElementById("engagement").value) || 0;
+      const trust = parseFloat(document.getElementById("trust").value) || 1;
+
+      const locationMultiplier = {
+        tanzania: 0.5,
+        africa: 1.0,
+        international: 3.0
+      };
+
+      const audienceMultiplier = {
+        general: 0.8,
+        social: 1.0,
+        business: 1.5,
+        crypto: 3.0
+      };
+
+      const engagementMultiplier = 1 + ((engagement / 100) * 5);
+
+      const smartCPM =
+        baseCPM *
+        locationMultiplier[location] *
+        audienceMultiplier[audience] *
+        engagementMultiplier *
+        trust;
+
+      const revenue = (impressions / 1000) * smartCPM;
+      return revenue;
+    }
+
+    function calculate() {
+      const impressions = parseFloat(document.getElementById("impressions").value) || 0;
+      const baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
+      const location = document.getElementById("location").value;
+      const audience = document.getElementById("audience").value;
+      const engagement = parseFloat(document.getElementById("engagement").value) || 0;
+      const trust = parseFloat(document.getElementById("trust").value) || 1;
+
+      const locationMultiplier = {
+        tanzania: 0.5,
+        africa: 1.0,
+        international: 3.0
+      };
+
+      const audienceMultiplier = {
+        general: 0.8,
+        social: 1.0,
+        business: 1.5,
+        crypto: 3.0
+      };
+
+      const engagementMultiplier = 1 + ((engagement / 100) * 5);
+
+      const smartCPM =
+        baseCPM *
+        locationMultiplier[location] *
+        audienceMultiplier[audience] *
+        engagementMultiplier *
+        trust;
+
+      const revenue = (impressions / 1000) * smartCPM;
+      const tzsRate = 2500;
+      const revenueTZS = revenue * tzsRate;
+      const revenuePerPlay = playCount > 0 ? revenue / playCount : 0;
+
+      document.getElementById("output").innerHTML = `
+        <h3>Estimated Results</h3>
+        <p><strong>Smart CPM:</strong> $${smartCPM.toFixed(2)}</p>
+        <p><strong>Total Revenue (USD):</strong> $${revenue.toFixed(2)}</p>
+        <p><strong>Total Revenue (TZS):</strong> ${revenueTZS.toLocaleString()} TZS</p>
+        <p><strong>Video Plays:</strong> ${playCount.toLocaleString()}</p>
+        <p><strong>Video Likes:</strong> ${likeCount.toLocaleString()}</p>
+        <p><strong>Estimated Revenue Per Play:</strong> $${revenuePerPlay.toFixed(2)}</p>
+      `;
+
+      updateStatsUI();
+    }
+
+    video.addEventListener("play", () => {
+      if (!hasCountedThisSessionPlay) {
+        playCount += 1;
+        hasCountedThisSessionPlay = true;
+        saveStats();
+        updateStatsUI();
+        calculate();
+      }
+    });
+
+    video.addEventListener("ended", () => {
+      hasCountedThisSessionPlay = false;
+    });
+
+    likeBtn.addEventListener("click", () => {
+      likeCount += 1;
+      saveStats();
+      updateStatsUI();
+      calculate();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      playCount = 0;
+      likeCount = 0;
+      hasCountedThisSessionPlay = false;
+      saveStats();
+      updateStatsUI();
+      calculate();
+    });
+
+    ["impressions", "baseCPM", "location", "audience", "engagement", "trust"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", () => {
+        calculate();
+      });
+      document.getElementById(id).addEventListener("change", () => {
+        calculate();
+      });
+    });
+
+    updateStatsUI();
+    calculate();
+  </script>
+</body>
+    </html>
