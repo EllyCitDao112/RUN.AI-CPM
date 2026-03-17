@@ -1,188 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generic CPM Engine</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-      padding: 40px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kikundi CPM Engine</title>
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: #1b1b1b;
-      padding: 24px;
-      border-radius: 14px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.35);
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0d0d0d;
+  color: #ffffff;
+}
 
-    h1 {
-      margin-top: 0;
-    }
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
 
-    label {
-      display: block;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+h1 {
+  text-align: center;
+}
 
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #333;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
+video {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
 
-    input, select {
-      background: #222;
-      color: #fff;
-    }
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
 
-    button {
-      margin-top: 20px;
-      background: #00c27a;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
+input, select {
+  background: #1a1a1a;
+  color: #fff;
+}
 
-    button:hover {
-      opacity: 0.92;
-    }
+button {
+  background: #00c27a;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    .result {
-      margin-top: 24px;
-      padding: 16px;
-      background: #222;
-      border-radius: 10px;
-    }
-
-    .small {
-      color: #bbb;
-      font-size: 14px;
-    }
-  </style>
+.result {
+  margin-top: 20px;
+  padding: 15px;
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Generic CPM Engine</h1>
-    <p class="small">Calculate Smart CPM and estimated ad revenue.</p>
 
-    <label for="impressions">Impressions</label>
-    <input type="number" id="impressions" placeholder="e.g. 1000000" />
+<div class="container">
 
-    <label for="baseCPM">Base CPM (USD)</label>
-    <input type="number" id="baseCPM" step="0.01" value="1.00" />
+<h1>📊 Kikundi CPM Engine</h1>
 
-    <label for="location">Location</label>
-    <select id="location">
-      <option value="tanzania">Tanzania</option>
-      <option value="africa">Africa</option>
-      <option value="international">International</option>
-    </select>
+<!-- VIDEO -->
+<video controls>
+  <source src="VID-20260317-WA0001.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-    <label for="audience">Audience Type</label>
-    <select id="audience">
-      <option value="general">General</option>
-      <option value="social">Social</option>
-      <option value="business">Business</option>
-      <option value="crypto">Crypto / Finance</option>
-    </select>
+<!-- INPUTS -->
+<label>Impressions</label>
+<input type="number" id="impressions" placeholder="e.g. 1000000">
 
-    <label for="engagementRate">Engagement Rate (%)</label>
-    <input type="number" id="engagementRate" step="0.01" value="5" />
+<label>Base CPM ($)</label>
+<input type="number" id="baseCPM" value="1">
 
-    <label for="trustScore">Trust Multiplier</label>
-    <select id="trustScore">
-      <option value="0.7">Anonymous</option>
-      <option value="1.0">Logged-in</option>
-      <option value="1.5">Verified</option>
-      <option value="2.0">Wallet Connected</option>
-      <option value="3.0">Premium Verified</option>
-    </select>
+<label>Location</label>
+<select id="location">
+  <option value="tanzania">Tanzania</option>
+  <option value="africa">Africa</option>
+  <option value="international">International</option>
+</select>
 
-    <button onclick="runCPMEngine()">Calculate</button>
+<label>Audience</label>
+<select id="audience">
+  <option value="general">General</option>
+  <option value="social">Social</option>
+  <option value="business">Business</option>
+  <option value="crypto">Crypto</option>
+</select>
 
-    <div class="result" id="result">
-      <strong>Results will appear here.</strong>
-    </div>
-  </div>
+<label>Engagement Rate (%)</label>
+<input type="number" id="engagement" value="5">
 
-  <script>
-    function calculateCPMRevenue(impressions, baseCPM, location, audience, engagementRate, trustScore) {
-      const locationMultiplier = {
-        tanzania: 0.5,
-        africa: 1.0,
-        international: 3.0
-      };
+<label>Trust Score</label>
+<select id="trust">
+  <option value="0.7">Anonymous</option>
+  <option value="1">Logged In</option>
+  <option value="1.5">Verified</option>
+  <option value="2">Wallet Connected</option>
+  <option value="3">Premium</option>
+</select>
 
-      const audienceMultiplier = {
-        general: 0.8,
-        social: 1.0,
-        business: 1.5,
-        crypto: 3.0
-      };
+<button onclick="calculate()">Calculate CPM</button>
 
-      const engagementMultiplier = 1 + ((engagementRate / 100) * 5);
-      const trustMultiplier = parseFloat(trustScore);
+<!-- RESULTS -->
+<div class="result" id="output">
+Results will appear here...
+</div>
 
-      const smartCPM =
-        baseCPM *
-        locationMultiplier[location] *
-        audienceMultiplier[audience] *
-        engagementMultiplier *
-        trustMultiplier;
+</div>
 
-      const revenue = (impressions / 1000) * smartCPM;
+<script>
+function calculate() {
 
-      return {
-        smartCPM,
-        revenue,
-        locationMultiplier: locationMultiplier[location],
-        audienceMultiplier: audienceMultiplier[audience],
-        engagementMultiplier,
-        trustMultiplier
-      };
-    }
+  let impressions = parseFloat(document.getElementById("impressions").value) || 0;
+  let baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
+  let location = document.getElementById("location").value;
+  let audience = document.getElementById("audience").value;
+  let engagement = parseFloat(document.getElementById("engagement").value) || 0;
+  let trust = parseFloat(document.getElementById("trust").value);
 
-    function runCPMEngine() {
-      const impressions = parseFloat(document.getElementById("impressions").value) || 0;
-      const baseCPM = parseFloat(document.getElementById("baseCPM").value) || 1;
-      const location = document.getElementById("location").value;
-      const audience = document.getElementById("audience").value;
-      const engagementRate = parseFloat(document.getElementById("engagementRate").value) || 0;
-      const trustScore = document.getElementById("trustScore").value;
+  const locationMultiplier = {
+    tanzania: 0.5,
+    africa: 1.0,
+    international: 3.0
+  };
 
-      const result = calculateCPMRevenue(
-        impressions,
-        baseCPM,
-        location,
-        audience,
-        engagementRate,
-        trustScore
-      );
+  const audienceMultiplier = {
+    general: 0.8,
+    social: 1.0,
+    business: 1.5,
+    crypto: 3.0
+  };
 
-      document.getElementById("result").innerHTML = `
-        <h2>Estimated Results</h2>
-        <p><strong>Smart CPM:</strong> $${result.smartCPM.toFixed(2)}</p>
-        <p><strong>Estimated Revenue:</strong> $${result.revenue.toFixed(2)}</p>
-        <hr>
-        <p><strong>Location Multiplier:</strong> ${result.locationMultiplier}x</p>
-        <p><strong>Audience Multiplier:</strong> ${result.audienceMultiplier}x</p>
-        <p><strong>Engagement Multiplier:</strong> ${result.engagementMultiplier.toFixed(2)}x</p>
-        <p><strong>Trust Multiplier:</strong> ${result.trustMultiplier.toFixed(2)}x</p>
-      `;
-    }
-  </script>
+  let engagementMultiplier = 1 + ((engagement / 100) * 5);
+
+  let smartCPM = baseCPM *
+                 locationMultiplier[location] *
+                 audienceMultiplier[audience] *
+                 engagementMultiplier *
+                 trust;
+
+  let revenue = (impressions / 1000) * smartCPM;
+
+  // TZS Conversion (approx)
+  let tzs = revenue * 2500;
+
+  document.getElementById("output").innerHTML = `
+    <h2>Results</h2>
+    <p><strong>Smart CPM:</strong> $${smartCPM.toFixed(2)}</p>
+    <p><strong>Revenue (USD):</strong> $${revenue.toFixed(2)}</p>
+    <p><strong>Revenue (TZS):</strong> ${tzs.toLocaleString()} TZS</p>
+  `;
+}
+</script>
+
 </body>
-  </html>
+</html>
