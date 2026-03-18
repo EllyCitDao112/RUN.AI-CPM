@@ -7,55 +7,38 @@
 
 <style>
 body {
-  margin: 0;
-  font-family: Arial;
-  background: #0d0d0d;
-  color: #fff;
+  background:#0d0d0d;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
 }
 
 .container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
 }
 
 .card {
-  background: #161616;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  background:#161616;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
 }
 
-video {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.stat {
-  font-size: 22px;
-  margin: 10px 0;
+input,button {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border:none;
+  border-radius:6px;
 }
 
 button {
-  padding: 10px;
-  margin-top: 10px;
-  width: 100%;
-  border: none;
-  border-radius: 8px;
-  background: #00c27a;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
+  background:#00c27a;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -66,123 +49,117 @@ input, select {
 
 <h1>©®™🏃🏿‍♂️RUN.AI CPM Engine</h1>
 
-<div class="card">
-
-<video id="video" controls>
-  <source src="VID-20260317-WA0001.mp4" type="video/mp4">
-</video>
-
-<div class="stat">Plays: <span id="plays">0</span></div>
-<div class="stat">Likes: <span id="likes">0</span></div>
-<div class="stat">Like Rate: <span id="rate">0%</span></div>
-
-<button onclick="like()">👍 Like</button>
-<button onclick="usePlays()">Use Plays as Impressions</button>
-
+<!-- AUTH -->
+<div class="card" id="authBox">
+<h2>Login / Signup</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+<button onclick="login()">Login</button>
 </div>
 
-<div class="card">
+<!-- DASHBOARD -->
+<div class="card" id="dashboard" style="display:none;">
+<h2>Creator Dashboard</h2>
 
-<input id="impressions" placeholder="Impressions">
+<div>Email: <span id="userEmail"></span></div>
+<div>Total Earnings: $<span id="earnings">0</span></div>
+<div>Withdrawable: $<span id="balance">0</span></div>
 
-<select id="location">
-<option value="tanzania">Tanzania</option>
-<option value="africa">Africa</option>
-<option value="international">International</option>
-</select>
-
-<select id="audience">
-<option value="general">General</option>
-<option value="crypto">Crypto</option>
-</select>
-
-<input id="engagement" placeholder="Engagement %" value="5">
-<input id="base" placeholder="Base CPM" value="1">
-
-<button onclick="calc()">Calculate</button>
-
-<div id="result"></div>
-
+<button onclick="requestPayout()">💸 Request Payout</button>
+<button onclick="logout()">Logout</button>
 </div>
 
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, onSnapshot, updateDoc, setDoc, getDoc, increment } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { 
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import { 
+  getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCyLB2daQh2tJL9d8DWxUPRmuyIZu-8Zzg",
   authDomain: "run-ai-80fb7.firebaseapp.com",
   projectId: "run-ai-80fb7",
-  storageBucket: "run-ai-80fb7.firebasestorage.app",
-  messagingSenderId: "962298240212",
-  appId: "1:962298240212:web:6642a45e94a6f583e3ef41"
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-const ref = doc(db, "run_ai_metrics", "main_video");
+// SIGNUP
+window.signup = async function(){
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("password").value;
 
-async function init() {
-  const snap = await getDoc(ref);
-  if (!snap.exists()) {
-    await setDoc(ref, { plays: 0, likes: 0 });
-  }
-}
-init();
+  let userCred = await createUserWithEmailAndPassword(auth,email,pass);
 
-onSnapshot(ref, (snap) => {
-  const data = snap.data();
-  document.getElementById("plays").innerText = data.plays;
-  document.getElementById("likes").innerText = data.likes;
-
-  let rate = data.plays > 0 ? (data.likes / data.plays) * 100 : 0;
-  document.getElementById("rate").innerText = rate.toFixed(2) + "%";
-});
-
-let counted = false;
-
-document.getElementById("video").addEventListener("play", async () => {
-  if (!counted) {
-    counted = true;
-    await updateDoc(ref, { plays: increment(1) });
-  }
-});
-
-document.getElementById("video").addEventListener("ended", () => {
-  counted = false;
-});
-
-window.like = async function () {
-  await updateDoc(ref, { likes: increment(1) });
+  await setDoc(doc(db,"users",userCred.user.uid),{
+    email,
+    totalEarnings:0,
+    withdrawableBalance:0
+  });
 };
 
-window.usePlays = function () {
-  document.getElementById("impressions").value =
-    document.getElementById("plays").innerText;
+// LOGIN
+window.login = async function(){
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("password").value;
+
+  await signInWithEmailAndPassword(auth,email,pass);
 };
 
-window.calc = function () {
+// LOGOUT
+window.logout = () => signOut(auth);
 
-  let impressions = parseFloat(document.getElementById("impressions").value) || 0;
-  let base = parseFloat(document.getElementById("base").value);
-  let engagement = parseFloat(document.getElementById("engagement").value);
-  let location = document.getElementById("location").value;
-  let audience = document.getElementById("audience").value;
+// AUTH STATE
+onAuthStateChanged(auth, async(user)=>{
+  if(user){
+    document.getElementById("authBox").style.display="none";
+    document.getElementById("dashboard").style.display="block";
 
-  let L = { tanzania: 0.5, africa: 1, international: 3 }[location];
-  let A = { general: 1, crypto: 3 }[audience];
-  let E = 1 + (engagement / 100) * 5;
+    document.getElementById("userEmail").innerText = user.email;
 
-  let CPM = base * L * A * E;
-  let revenue = (impressions / 1000) * CPM;
+    let snap = await getDoc(doc(db,"users",user.uid));
+    let data = snap.data();
 
-  document.getElementById("result").innerHTML =
-    "CPM: $" + CPM.toFixed(2) +
-    "<br>Revenue: $" + revenue.toFixed(2);
+    document.getElementById("earnings").innerText = data.totalEarnings.toFixed(2);
+    document.getElementById("balance").innerText = data.withdrawableBalance.toFixed(2);
+
+  } else {
+    document.getElementById("authBox").style.display="block";
+    document.getElementById("dashboard").style.display="none";
+  }
+});
+
+// PAYOUT REQUEST
+window.requestPayout = async function(){
+  let user = auth.currentUser;
+  let snap = await getDoc(doc(db,"users",user.uid));
+  let data = snap.data();
+
+  if(data.withdrawableBalance <= 0){
+    alert("No balance");
+    return;
+  }
+
+  await addDoc(collection(db,"payouts"),{
+    userId:user.uid,
+    amount:data.withdrawableBalance,
+    status:"pending",
+    created:Date.now()
+  });
+
+  await updateDoc(doc(db,"users",user.uid),{
+    withdrawableBalance:0
+  });
+
+  alert("Payout requested");
 };
 </script>
 
